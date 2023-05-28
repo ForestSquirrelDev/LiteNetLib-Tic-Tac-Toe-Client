@@ -74,7 +74,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Aa]ddressableAssetsData/
 .idea
 
-/Assets/Plugins
 *.meta
 ProjectSettings
 Assets/TextMesh Pro
