@@ -8,6 +8,7 @@ using Grid = Core.Entities.Grid;
 using MessageType = ServerShared.Shared.Network.MessageType;
 
 namespace Core.Systems {
+
     public class GridGeneratorSystem : SystemBase, IGizmoDrawable, INetMessageListener {
         private IncomingPacketsPipe _incomingPacketsPipe;
         

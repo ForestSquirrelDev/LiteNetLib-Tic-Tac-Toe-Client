@@ -50,8 +50,7 @@ namespace Core.Managers {
             _incomingPacketsPipe.ProcessMessage(peer, reader, deliveryMethod);
         }
 
-        public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType) {
-        }
+        public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType) { }
 
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency) { }
 

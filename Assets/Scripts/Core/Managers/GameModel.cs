@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace Core.Managers {
     public class GameModel : MonoBehaviour {
+        [SerializeField] private Camera _mainCamera;
+        
         public World World { get; private set; }
         public ConnectionManager ConnectionManager { get; private set; }
         public GameLoop GameLoop { get; private set; }
@@ -22,9 +24,9 @@ namespace Core.Managers {
             _outgoingPacketsPipe = new OutgoingPacketsPipe(_incomingPacketsPipe);
             ConnectionManager = new ConnectionManager(_incomingPacketsPipe);
             
-            var systemsBuilder = new SystemsBuilder(World);
+            var systemsBuilder = new SystemsBuilder(World, _outgoingPacketsPipe, _incomingPacketsPipe, _mainCamera);
             var entitiesBuilder = new EntitiesBuilder(World);
-            systemsBuilder.Build(_outgoingPacketsPipe, _incomingPacketsPipe);
+            systemsBuilder.Build();
             entitiesBuilder.Build();
 
             GameLoop.AddUpdateable(ConnectionManager);
