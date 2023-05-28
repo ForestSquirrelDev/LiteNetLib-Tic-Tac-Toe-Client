@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
-using PoorMansECS.Components;
+﻿using PoorMansECS.Components;
 
 namespace Core.Components {
-    public class GridCellsComponent : IComponentData {
-        public List<GridCell> Cells { get; } = new();
+    public readonly struct GridCellsComponent : IComponentData {
+        public GridCell [,] Cells { get; }
+
+        public GridCellsComponent(GridCell[,] cells) {
+            Cells = cells;
+        }
     }
 }

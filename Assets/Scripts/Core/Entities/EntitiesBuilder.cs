@@ -1,4 +1,5 @@
 ﻿using Core.Components;
+using Core.Systems;
 using PoorMansECS;
 using ServerShared.Shared.Network;
 
@@ -19,6 +20,8 @@ namespace Core.Entities {
         private void BuildGrid(World world) {
             var grid = world.CreateEntity<Grid>();
             grid.SetComponent(new GridCellsComponent());
+            grid.SetComponent(new GridStartComponent());
+            grid.SetComponent(new CellSizeComponent());
         }
 
         private void BuildRoom(World world) {
