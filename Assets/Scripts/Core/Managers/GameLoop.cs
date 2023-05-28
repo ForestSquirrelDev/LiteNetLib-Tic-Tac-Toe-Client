@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.Systems;
 using PoorMansECS.Systems;
+using Unity.VisualScripting;
 
 namespace Core.Managers {
     public class GameLoop {
@@ -28,8 +29,8 @@ namespace Core.Managers {
             _updateables.Add(updateable);
         }
 
-        public void AddGizmoDrawable(IGizmoDrawable drawable) {
-            _gizmoDrawables.Add(drawable);
+        public void AddGizmoDrawables(IEnumerable<IGizmoDrawable> drawable) {
+            _gizmoDrawables.AddRange(drawable);
         }
     }
 }

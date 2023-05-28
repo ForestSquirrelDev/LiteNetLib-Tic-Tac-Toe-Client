@@ -1,45 +1,51 @@
-﻿using System;
+﻿using System.Linq;
+using Core.Entities;
 using Core.Systems;
-using LiteNetLib;
+using PoorMansECS;
+using Server.Shared.Network;
+using ServerShared.Shared.Network;
 using UnityEngine;
 
 namespace Core.Managers {
     public class GameModel : MonoBehaviour {
-        public event Action Started;
-    
+        public World World { get; private set; }
         public ConnectionManager ConnectionManager { get; private set; }
-        public MessagesPipe MessagesPipe { get; private set; }
-        public PoorMansECS.Entities.Entities Entities { get; private set; }
-        public SystemsManager SystemsManager { get; private set; }
         public GameLoop GameLoop { get; private set; }
+        
+        private OutgoingPacketsPipe _outgoingPacketsPipe;
+        private IncomingPacketsPipe _incomingPacketsPipe;
     
         private void Awake() {
-            ConnectionManager = new ConnectionManager();
-            Entities = new PoorMansECS.Entities.Entities();
+            World = new World();
             GameLoop = new GameLoop();
-            MessagesPipe = new MessagesPipe(ConnectionManager);
-            SystemsManager = new SystemsManager(Entities, MessagesPipe);
+            _incomingPacketsPipe = new IncomingPacketsPipe();
+            _outgoingPacketsPipe = new OutgoingPacketsPipe(_incomingPacketsPipe);
+            ConnectionManager = new ConnectionManager(_incomingPacketsPipe);
+            
+            var systemsBuilder = new SystemsBuilder(World);
+            var entitiesBuilder = new EntitiesBuilder(World);
+            systemsBuilder.Build(_outgoingPacketsPipe, _incomingPacketsPipe);
+            entitiesBuilder.Build();
+
+            GameLoop.AddUpdateable(ConnectionManager);
+            GameLoop.AddUpdateable(World);
+
+#if UNITY_EDITOR
+            GameLoop.AddGizmoDrawables(World.Systems.GetAll().OfType<IGizmoDrawable>());
+#endif
         }
 
         private void Start() {
-            GameLoop.AddUpdateable(SystemsManager);
-            GameLoop.AddUpdateable(ConnectionManager);
-            GameLoop.AddGizmoDrawable(SystemsManager);
-        
-            SystemsManager.Start();
-            Started?.Invoke();
+            ConnectionManager.Start();
+            World.Start();
+            
+            ConnectionManager.Connect();
         }
 
         private void Update() {
-            GameLoop.Update(Time.unscaledDeltaTime);
-            if (Input.GetKeyDown(KeyCode.H)) {
-                ConnectionManager.Connect();
-            }
+            GameLoop.Update(Time.deltaTime);
         }
 
-        private void OnDestroy() {
-        }
-    
 #if UNITY_EDITOR
         private void OnDrawGizmos() {
             if (!Application.isPlaying) return;

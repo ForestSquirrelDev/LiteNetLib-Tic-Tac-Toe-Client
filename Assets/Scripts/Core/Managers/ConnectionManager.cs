@@ -2,19 +2,25 @@
 using System.Net.Sockets;
 using LiteNetLib;
 using PoorMansECS.Systems;
+using ServerShared.Shared.Network;
 using UnityEngine;
 
 namespace Core.Managers {
     public class ConnectionManager : INetEventListener, IUpdateable {
         private readonly NetManager _netManager;
-    
+        private readonly IncomingPacketsPipe _incomingPacketsPipe;
+        
         private NetPeer _server;
 
-        public ConnectionManager() {
+        public ConnectionManager(IncomingPacketsPipe incomingPacketsPipe) {
             _netManager = new NetManager(this) {
                 AutoRecycle = true,
                 IPv6Enabled = false
             };
+            _incomingPacketsPipe = incomingPacketsPipe;
+        }
+
+        public void Start() {
             _netManager.Start();
         }
     
@@ -23,7 +29,7 @@ namespace Core.Managers {
         }
 
         public void Connect() {
-            _netManager.Connect("localhost", 9999, "SomeConnectionKey");
+            _netManager.Connect("192.168.133.196", 9050, "SomeConnectionKey");
         }
 
         public void OnPeerConnected(NetPeer peer) {
@@ -36,15 +42,15 @@ namespace Core.Managers {
         }
 
         public void OnNetworkError(IPEndPoint endPoint, SocketError socketError) {
-            Debug.LogError($"OnNetworkError. Endpoint: {endPoint.Address}. Socket error: {socketError}");
+            Debug.LogError($"OnNetworkError: {socketError.ToString()}");
         }
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod) {
-            Debug.Log($"OnNetworkReceive: {reader.GetString()}");
+            Debug.Log($"Network receive: {reader.RawData}");
+            _incomingPacketsPipe.ProcessMessage(peer, reader, deliveryMethod);
         }
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType) {
-            Debug.Log("OnNetworkReceiveUnconnected");
         }
 
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency) { }
