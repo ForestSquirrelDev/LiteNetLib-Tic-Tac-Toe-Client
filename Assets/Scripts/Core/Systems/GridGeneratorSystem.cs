@@ -9,7 +9,7 @@ using MessageType = ServerShared.Shared.Network.MessageType;
 
 namespace Core.Systems {
     public class GridGeneratorSystem : SystemBase, IGizmoDrawable, INetMessageListener {
-        private IncomingPacketsPipe _incomingPacketsPipe;
+        private IncomingMessagesPipe _incomingMessagesPipe;
         
         private const float _cellSize = 3.2f;
         private Vector3 _gridStart;
@@ -18,12 +18,12 @@ namespace Core.Systems {
         
         public GridGeneratorSystem(SystemsContext context) : base(context) { }
 
-        public void InjectDependencies(IncomingPacketsPipe incomingPacketsPipe) {
-            _incomingPacketsPipe = incomingPacketsPipe;
+        public void InjectDependencies(IncomingMessagesPipe incomingMessagesPipe) {
+            _incomingMessagesPipe = incomingMessagesPipe;
         }
 
         protected override void OnStart() {
-            _incomingPacketsPipe.Register(MessageType.GameStartedMessage, this);
+            _incomingMessagesPipe.Register(MessageType.GameStartedMessage, this);
         }
         
         public void ReceiveMessage(MessageWrapper messageWrapper) {
@@ -44,6 +44,7 @@ namespace Core.Systems {
         }
 
         public void DrawGizmos() {
+#if UNITY_EDITOR
             Handles.color = Color.red;
             Handles.DrawSolidDisc(_gridStart, Vector3.forward, .3f);
         
@@ -70,6 +71,7 @@ namespace Core.Systems {
                 centerPosition.y + (_gridSizeYStartingFromZero * 0.5f * _cellSize) ,
                 centerPosition.z);
             Handles.DrawSolidDisc(upperRightCorner, Vector3.forward, .3f);
+#endif
         }
 
         private (Vector3 gridStart, GridCellsComponent gridCellsComponent) GenerateGrid(Vector2 gridSize)

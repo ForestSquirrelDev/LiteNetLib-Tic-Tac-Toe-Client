@@ -8,16 +8,16 @@ using UnityEngine;
 namespace Core.Managers {
     public class ConnectionManager : INetEventListener, IUpdateable {
         private readonly NetManager _netManager;
-        private readonly IncomingPacketsPipe _incomingPacketsPipe;
+        private readonly IncomingMessagesPipe _incomingMessagesPipe;
         
         private NetPeer _server;
 
-        public ConnectionManager(IncomingPacketsPipe incomingPacketsPipe) {
+        public ConnectionManager(IncomingMessagesPipe incomingMessagesPipe) {
             _netManager = new NetManager(this) {
                 AutoRecycle = true,
                 IPv6Enabled = false
             };
-            _incomingPacketsPipe = incomingPacketsPipe;
+            _incomingMessagesPipe = incomingMessagesPipe;
         }
 
         public void Start() {
@@ -28,8 +28,12 @@ namespace Core.Managers {
             _netManager.PollEvents();   
         }
 
+        public void Dispose() {
+            _server?.Disconnect();
+        }
+
         public void Connect() {
-            _netManager.Connect("192.168.133.196", 9050, "SomeConnectionKey");
+            _netManager.Connect("192.168.103.196", 9050, "SomeConnectionKey");
         }
 
         public void OnPeerConnected(NetPeer peer) {
@@ -47,7 +51,7 @@ namespace Core.Managers {
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod) {
             Debug.Log($"Network receive: {reader.RawData}");
-            _incomingPacketsPipe.ProcessMessage(peer, reader, deliveryMethod);
+            _incomingMessagesPipe.ProcessMessage(peer, reader, deliveryMethod);
         }
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType) { }

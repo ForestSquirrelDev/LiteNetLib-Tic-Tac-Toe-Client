@@ -7,21 +7,21 @@ using UnityEngine;
 namespace Core.Systems {
     public class SystemsBuilder {
         private readonly World _world;
-        private readonly OutgoingPacketsPipe _outgoingPacketsPipe;
-        private readonly IncomingPacketsPipe _incomingPacketsPipe;
+        private readonly OutgoingMessagesPipe _outgoingMessagesPipe;
+        private readonly IncomingMessagesPipe _incomingMessagesPipe;
         private readonly Camera _mainCamera;
 
-        public SystemsBuilder(World world, OutgoingPacketsPipe outgoingPacketsPipe, IncomingPacketsPipe incomingPacketsPipe, Camera mainCamera) {
+        public SystemsBuilder(World world, OutgoingMessagesPipe outgoingMessagesPipe, IncomingMessagesPipe incomingMessagesPipe, Camera mainCamera) {
             _world = world;
-            _outgoingPacketsPipe = outgoingPacketsPipe;
-            _incomingPacketsPipe = incomingPacketsPipe;
+            _outgoingMessagesPipe = outgoingMessagesPipe;
+            _incomingMessagesPipe = incomingMessagesPipe;
             _mainCamera = mainCamera;
         }
 
         public void Build() {
-            _world.CreateSystem<GridGeneratorSystem>().InjectDependencies(_incomingPacketsPipe);
-            _world.CreateSystem<JoinHandlerSystem>().InjectDependencies(_incomingPacketsPipe, _outgoingPacketsPipe);
-            _world.CreateSystem<PlayerInputSystem>().InjectDependencies(_mainCamera, _outgoingPacketsPipe);
+            _world.CreateSystem<GridGeneratorSystem>().InjectDependencies(_incomingMessagesPipe);
+            _world.CreateSystem<JoinHandlerSystem>().InjectDependencies(_incomingMessagesPipe, _outgoingMessagesPipe);
+            _world.CreateSystem<PlayerInputSystem>().InjectDependencies(_mainCamera, _outgoingMessagesPipe);
         }
     }
 }

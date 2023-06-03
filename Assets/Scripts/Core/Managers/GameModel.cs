@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.Entities;
 using Core.Systems;
 using PoorMansECS;
@@ -13,18 +14,17 @@ namespace Core.Managers {
         public World World { get; private set; }
         public ConnectionManager ConnectionManager { get; private set; }
         public GameLoop GameLoop { get; private set; }
-        
-        private OutgoingPacketsPipe _outgoingPacketsPipe;
-        private IncomingPacketsPipe _incomingPacketsPipe;
+        public OutgoingMessagesPipe OutgoingMessagesPipe { get; private set; }
+        public IncomingMessagesPipe IncomingMessagesPipe { get; private set; }
     
         private void Awake() {
             World = new World();
             GameLoop = new GameLoop();
-            _incomingPacketsPipe = new IncomingPacketsPipe();
-            _outgoingPacketsPipe = new OutgoingPacketsPipe(_incomingPacketsPipe);
-            ConnectionManager = new ConnectionManager(_incomingPacketsPipe);
+            IncomingMessagesPipe = new IncomingMessagesPipe();
+            OutgoingMessagesPipe = new OutgoingMessagesPipe(IncomingMessagesPipe);
+            ConnectionManager = new ConnectionManager(IncomingMessagesPipe);
             
-            var systemsBuilder = new SystemsBuilder(World, _outgoingPacketsPipe, _incomingPacketsPipe, _mainCamera);
+            var systemsBuilder = new SystemsBuilder(World, OutgoingMessagesPipe, IncomingMessagesPipe, _mainCamera);
             var entitiesBuilder = new EntitiesBuilder(World);
             systemsBuilder.Build();
             entitiesBuilder.Build();
@@ -46,6 +46,10 @@ namespace Core.Managers {
 
         private void Update() {
             GameLoop.Update(Time.deltaTime);
+        }
+
+        private void OnDestroy() {
+            ConnectionManager.Dispose();
         }
 
 #if UNITY_EDITOR

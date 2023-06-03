@@ -9,18 +9,18 @@ using UnityEngine;
 
 namespace Core.Systems {
     public class JoinHandlerSystem : SystemBase, INetMessageListener {
-        private IncomingPacketsPipe _incomingPacketsPipe;
-        private OutgoingPacketsPipe _outgoingPacketsPipe;
+        private IncomingMessagesPipe _incomingMessagesPipe;
+        private OutgoingMessagesPipe _outgoingMessagesPipe;
         
         public JoinHandlerSystem(SystemsContext context) : base(context) { }
 
-        public void InjectDependencies(IncomingPacketsPipe incomingPacketsPipe, OutgoingPacketsPipe outgoingPacketsPipe) {
-            _incomingPacketsPipe = incomingPacketsPipe;
-            _outgoingPacketsPipe = outgoingPacketsPipe;
+        public void InjectDependencies(IncomingMessagesPipe incomingMessagesPipe, OutgoingMessagesPipe outgoingMessagesPipe) {
+            _incomingMessagesPipe = incomingMessagesPipe;
+            _outgoingMessagesPipe = outgoingMessagesPipe;
         }
 
         protected override void OnStart() {
-            _incomingPacketsPipe.Register(MessageType.ConnectionEstablishedMessage, this);
+            _incomingMessagesPipe.Register(MessageType.ConnectionEstablishedMessage, this);
         }
 
         protected override void OnUpdate(float delta) { }
@@ -32,10 +32,10 @@ namespace Core.Systems {
                 return;
             
             _context.World.Entities.GetFirst<Room>().SetComponent(new RoomServerComponent(messageWrapper.AssociatedPeer));
-            RequestAndProcessJoin(_outgoingPacketsPipe, messageWrapper.AssociatedPeer, _context);
+            RequestAndProcessJoin(_outgoingMessagesPipe, messageWrapper.AssociatedPeer, _context);
         }
         
-        private async void RequestAndProcessJoin(OutgoingPacketsPipe outgoingPacketsPipe, NetPeer server, SystemsContext context) {
+        private async void RequestAndProcessJoin(OutgoingMessagesPipe outgoingPacketsPipe, NetPeer server, SystemsContext context) {
             var joinRequest = new JoinRequestMessage();
             var (success, response) = 
                 await outgoingPacketsPipe.SendAndWaitForResponse(server, joinRequest, MessageType.AcceptJoinMessage, 2);
