@@ -1,0 +1,5 @@
+{
+	"host": "192.168.103.196",
+	"port": 9050,
+	"connection_key": "SomeConnectionKey"
+}
