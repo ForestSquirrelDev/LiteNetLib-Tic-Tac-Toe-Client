@@ -22,4 +22,4 @@ In this video i enter and finish the game with two separate Unity editor instanc
 https://github.com/ForestSquirrelDev/LiteNetLib-Tic-Tac-Toe-Client/assets/82777171/0ba3c923-2805-4cf3-b9c8-a0df9a142999
 
 
-###### This readme is mirror of [Server-side]([https://github.com/ForestSquirrelDev/LiteNetLib-Tic-Tac-Toe-Client](https://github.com/ForestSquirrelDev/LiteNetLib-Tic-Tac-Toe-Server)) repository
+###### This readme is mirror of [Server-side](https://github.com/ForestSquirrelDev/LiteNetLib-Tic-Tac-Toe-Server) repository
